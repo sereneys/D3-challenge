@@ -114,7 +114,7 @@ function yScales(yMin, yMax) {
 
 
 //Import CSV data
-d3.csv("asset/data/data.csv").then(function(data) {
+d3.csv("assets/data/data.csv").then(function(data) {
   createChart(data);
 });
 
@@ -133,10 +133,10 @@ function createChart(theData) {
       var theState = "<div>" + d.state + "</div>";
       var theY = "<div>" + curY + ":" + d[curY] + "%</div>";
 
-      return theState + theX + theY
+      return theState + theX + theY;
     });
   
-  chartGroup.call(toolTip);
+ svg.call(toolTip);
 
   var xMin;
   var xMax;
@@ -144,21 +144,21 @@ function createChart(theData) {
   var yMax;
 
   function xMinMax() {
-    xMin = d3.min(theData. function(d) {
+    xMin = d3.min(theData, function(d) {
       return parseFloat(d[curX]) * 0.90;
     });
 
-    xMax = d3.max(theData. function(d) {
+    xMax = d3.max(theData, function(d) {
       return parseFloat(d[curX]) * 1.10;
     });
   }
 
   function yMinMax() {
-    yMin = d3.min(theData. function(d) {
+    yMin = d3.min(theData, function(d) {
       return parseFloat(d[curY]) * 0.90;
     });
 
-    yMax = d3.max(theData. function(d) {
+    yMax = d3.max(theData, function(d) {
       return parseFloat(d[curY]) * 1.10;
     });
   }
@@ -279,7 +279,7 @@ function createChart(theData) {
             d3
               .select(this)
               .transition()
-              .attr("cy", d=> yScale(d[curY])
+              .attr("cy", d=> yScale(d[curY]))
               .duration(300);
           });
 
@@ -287,7 +287,7 @@ function createChart(theData) {
             d3
               .select(this)
               .transition()
-              .attr("cy", d=> yScale(d[curY])
+              .attr("cy", d=> yScale(d[curY]))
               .duration(300);
           });
 
@@ -296,16 +296,5 @@ function createChart(theData) {
       }
     });
 
-    
-
-
-
-
-
-
-
-
-
-    
-
+  
   }
