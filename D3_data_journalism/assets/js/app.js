@@ -3,13 +3,13 @@
 //set up svg
 var svgWidth = parseInt(d3.select("#scatter").style("width"));
 
-var svgHeight = width - width/4;
+var svgHeight = svgWidth - svgWidth/4;
 
 var margin = {
     top: 20,
-    right: 40,
-    bottom: 80,
-    left: 100
+    right: 5,
+    bottom: 90,
+    left: 90
   };
   
 var width = svgWidth - margin.left - margin.right;
@@ -22,7 +22,7 @@ var leftPad = 40;
 
 // Create an SVG wrapper, append an SVG group that will hold our chart,
 // and shift the latter by left and top margins.
-var svg = d3.select("scatter")
+var svg = d3.select("#scatter")
     .append("svg")
     .attr("width", svgWidth)
     .attr("height", svgHeight)
@@ -36,41 +36,48 @@ var chartGroup = svg.append("g")
 
 // Left Y Axis
 
-svg.append("g").attr("class", "yLabel");
+chartGroup.append("g").attr("class", "yText");
 
-var yLabel = d3.select(".yLabel");
+var yLabel = d3.select(".yText");
 
 //append y labels text
 var obesityLabel = yLabel.append("text")
-  .attr("y", -25)
+  .attr("transform", "rotate(-90)")
+  .attr("y", -30)
+  .attr("x", 0 - (height / 2))
   .attr("data-axis", "y")
   .attr("data-name", "obesity")
   .attr("class", "aText active y")
   .text("Obesity (%)");
 
 var smokesLabel = yLabel.append("text")
-  .attr("y", 0)
+  .attr("transform", "rotate(-90)")
+  .attr("y", -55)
+  .attr("x", 0 - (height / 2))
   .attr("data-axis", "y")
   .attr("data-name", "smokes")
   .attr("class", "aText inactive y")
   .text("Smokes (%)");
 
 var healthcareLabel = yLabel.append("text")
-  .attr("y", 25)
+  .attr("transform", "rotate(-90)")
+  .attr("y", -80)
+  .attr("x", 0 - (height / 2))
   .attr("data-axis", "y")
   .attr("data-name", "healthcare")
   .attr("class", "aText inactive y")
   .text("Lacks Healthcare (%)");
 
 // Bottom X Axis
-svg.append("g").attr("class", "xLabel");
+chartGroup.append("g").attr("class", "xText");
 
-var xLabel = d3.select(".xLabel");
+var xLabel = d3.select(".xText");
 
 //append X labels text
 xLabel
   .append("text")
-  .attr("x", -25)
+  .attr("x", (width/2))
+  .attr("y", height+35)
   .attr("data-axis", "x")
   .attr("data-name", "poverty")
   .attr("class", "aText active x")
@@ -78,15 +85,17 @@ xLabel
 
 xLabel
   .append("text")
-  .attr("y", 0)
-  .attr("data-axis", "y")
+  .attr("x", (width/2))
+  .attr("y", height+60)
+  .attr("data-axis", "x")
   .attr("data-name", "age")
   .attr("class", "aText inactive x")
   .text("Age (Median)");
 
 xLabel
   .append("text")
-  .attr("y", 25)
+  .attr("x", (width/2))
+  .attr("y", height+85)
   .attr("data-axis", "x")
   .attr("data-name", "income")
   .attr("class", "aText inactive x")
@@ -125,18 +134,18 @@ function createChart(theData) {
   var curY = "obesity";
 
   var toolTip = d3
-    .tip()
-    .attr("class", "d3-tip")
-    .offset([80, -60])
-    .html(function(d) {
-      var theX = "<div>" + curX + ":" + d[curX] + "</div>";
-      var theState = "<div>" + d.state + "</div>";
-      var theY = "<div>" + curY + ":" + d[curY] + "%</div>";
+  .tip()
+  .attr("class", "d3-tip")
+  .offset([80, -60])
+  .html(function(d) {
+    var theX = "<div>" + curX + ":" + d[curX] + "</div>";
+    var theState = "<div>" + d.state + "</div>";
+    var theY = "<div>" + curY + ":" + d[curY] + "%</div>";
 
-      return theState + theX + theY;
-    });
+    return theState + theX + theY;
+  });
   
- svg.call(toolTip);
+  chartGroup.call(toolTip);
 
   var xMin;
   var xMax;
@@ -165,7 +174,7 @@ function createChart(theData) {
 
   function labelUpdate(axis, clickedText) {
     d3
-      .selectAll("aText")
+      .selectAll(".aText")
       .filter("." + axis)
       .filter(".active")
       .classed("active", false)
@@ -198,7 +207,7 @@ function createChart(theData) {
     .attr("transform", `translate(0, 0)`);
 
   // append circles
-  var circlesGroup = chartGroup.selectAll("circle")
+  var circlesGroup = chartGroup.selectAll("g theCircles")
     .data(theData)
     .enter()
     
@@ -206,31 +215,33 @@ function createChart(theData) {
     .append("circle")
     .attr("cx", d => xScale(d[curX]))
     .attr("cy", d => yScale(d[curY]))
-    .attr("r", 20)
-    .attr("class", d => "stateCircle" + d.abbr)
+    .attr("r", 10)
+    .attr("class", function(d) {
+      return "stateCircle " + d.abbr;
+    })
     .on("mouseover", function(d) {
-      toolTip.show(d. this);
-      d3.select(this).style("stroke", "#323232");
+      toolTip.show(d, this);
+      d3.select(this).style("stroke", "red");
     })
     .on("mouseout", function(d) {
-      toolTip.hide(d);
-      d3.select(this).style("stroke","#e3e3e3");
+      toolTip.hide(d, this);
+      d3.select(this).style("stroke", "#e3e3e3");
     });
   
   circlesGroup
     .append("text")
     .text(d => d.abbr)
     .attr("dx", d => xScale(d[curX]))
-    .attr("dy", d => yScale(d[curY]))
-    .attr("font-szie", 20)
+    .attr("dy", d => (yScale(d[curY]) + 4))
+    .attr("font-szie", 4)
     .attr("class", "stateText")
     .on("mouseover", function(d) {
       toolTip.show(d);
-      d3.select("." + d.abbr).style("stroke", "#323232");
+      d3.select("." + d.abbr).style("stroke", "red");
     })
     .on("mouseout", function(d) {
       toolTip.hide(d);
-      d3.select("." + d.abbr).style("stroke","#e3e3e3");
+      d3.select("." + d.abbr).style("stroke", "#e3e3e3");
     });
     
     d3.selectAll(".aText").on("click", function() {
@@ -238,8 +249,8 @@ function createChart(theData) {
       var self = d3.select(this);
 
       if (self.classed("inactive")) {
-        var axis = attr.attr("data-axis")
-        var name = selc.attr("data-name")
+        var axis = self.attr("data-axis")
+        var name = self.attr("data-name")
 
         if (axis === "x") {
           curX = name;
@@ -261,7 +272,7 @@ function createChart(theData) {
             d3
               .select(this)
               .transition()
-              .attr("cx", d=> xScale(d[curX]))
+              .attr("dx", d=> xScale(d[curX]))
               .duration(300);
           });
 
@@ -287,7 +298,7 @@ function createChart(theData) {
             d3
               .select(this)
               .transition()
-              .attr("cy", d=> yScale(d[curY]))
+              .attr("dy", d=> yScale(d[curY]))
               .duration(300);
           });
 
@@ -295,6 +306,5 @@ function createChart(theData) {
         }
       }
     });
-
   
-  }
+}
